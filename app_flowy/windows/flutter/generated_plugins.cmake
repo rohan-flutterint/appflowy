@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   flowy_editor
   flowy_infra_ui
+  flowy_sdk
   url_launcher_windows
   window_size
 )

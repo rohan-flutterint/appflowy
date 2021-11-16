@@ -1,27 +1,36 @@
 # cargo make --profile production task
-
-[tasks.flowy-sdk]
-category = "Build"
-condition = { channels = ["nightly"] }
-dependencies = ["flowy-sdk-build"]
-run_task = { name = ["copy-to-sys-tmpdir"] }
-
-[tasks.flowy-sdk-build]
+[tasks.env_check]
 dependencies = ["echo_env"]
-condition = { env_set = [ "BUILD_FLAG", "RUST_COMPILE_TARGET", "CRATE_TYPE", "TARGET_OS"] }
-run_task = { name = ["setup-crate-type","sdk-build", "post-desktop", "restore-crate-type"] }
+condition = { env_set = [ "BUILD_FLAG", "RUST_COMPILE_TARGET", "CRATE_TYPE", "TARGET_OS"],  channels = ["nightly"] }
 
-[tasks.sdk-build]
-description = "Build desktop targets."
+[tasks.flowy-sdk-dev]
+description = "Build flowy sdk in dev mode"
+category = "Build"
+dependencies = ["env_check"]
+run_task = { name = ["setup-crate-type","sdk-dev-build", "post-desktop", "restore-crate-type", "copy-to-sys-tmpdir"] }
+
+[tasks.sdk-dev-build]
 script = [
   """
     cd rust-lib/
-    if [ ${BUILD_FLAG} == release ]
-    then
-      cargo build --${BUILD_FLAG} --package=dart-ffi --target ${RUST_COMPILE_TARGET} --features=${FEATURES}
-    else
-      cargo build --package=dart-ffi --target ${RUST_COMPILE_TARGET} --features=${FEATURES}
-    fi
+    cargo build --package=dart-ffi --target ${RUST_COMPILE_TARGET} --features=${FEATURES}
+    cd ../
+  """,
+]
+script_runner = "@shell"
+
+[tasks.flowy-sdk-release]
+description = "Build flowy sdk in release mode"
+category = "Build"
+dependencies = ["env_check"]
+run_task = { name = ["setup-crate-type","sdk-release-build", "post-desktop", "restore-crate-type"] }
+
+
+[tasks.sdk-release-build]
+script = [
+  """
+    cd rust-lib/
+    cargo build --${BUILD_FLAG} --package=dart-ffi --target ${RUST_COMPILE_TARGET} --features=${FEATURES}
     cd ../
   """,
 ]
