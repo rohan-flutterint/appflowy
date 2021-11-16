@@ -10,12 +10,22 @@ condition = { env_set = [ "BUILD_FLAG", "RUST_COMPILE_TARGET", "CRATE_TYPE", "TA
 
 [tasks.flowy-sdk-dev]
 description = "Build flowy sdk in dev mode"
+mac_alias = "flowy-sdk-dev-macos"
+windows_alias = "flowy-sdk-dev-windows"
+
+[tasks.flowy-sdk-dev-macos]
 category = "Build"
 dependencies = ["env_check"]
-run_task = { name = ["setup-crate-type","sdk-dev-build", "post-desktop", "restore-crate-type", "copy-to-sys-tmpdir"] }
+run_task = { name = ["setup-crate-type","sdk-build", "post-desktop", "restore-crate-type"] }
+
+[tasks.flowy-sdk-dev-windows]
+category = "Build"
+dependencies = ["env_check"]
+run_task = { name = ["setup-crate-type","sdk-build", "post-desktop", "restore-crate-type"] }
 
 #
-[tasks.sdk-dev-build]
+[tasks.sdk-build]
+private = true
 script = [
   """
     cd rust-lib/
